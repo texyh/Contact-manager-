@@ -4,14 +4,15 @@ manager.py: Contains the application functionality
 
 
 Usage:
-	manager.py add (<name> <phonenumeber>)
+	manager.py add  <name> <phonenumber>
 	manager.py search (<name>)
 	manager.py text (<name> <message>)
 	manager.py show_all
 
 
 Options:
-	-h --help					Show this screen
+	-h --help	 Show this screen
+
 
 
 """
@@ -36,34 +37,27 @@ class Contact():
 		try:
 			session.add(user)
 			session.commit()
+			print ('contact saved')
 		except:
 			session.rollback()
 
 	def search(self,name):
 		self.name = name
-		results = session.query(User).filter_by(name).all()
-		for i in results:
-			if name in i or name == i:
-				res.append(i.split(' '))
+		results = session.query(User).all()
+		found_persons = {}
+		for person in results:
+			if name in person.name or name == person.name:
+				found_persons[person.name] = person.phonenumber 
 			continue
-		if len(res) == 1:
-			if len(res[0]) > 1:
-				only_contact = " ".join(res[0])
-				print (self.contacts[only_contact])
-			else:
-				only_contact = res[0][0]
-				print (self.contacts[only_contact])
-		elif len(res)>1:
-			print ('which {}?'.format(name))
-
-			for j in range (len(res)):
-				print ('{}{},'.format([j+1],res[j][1]),)
-
-			choice = int(raw_input('\n'))
-			rc = ' '.join(res[choice-1])
-			print (self.contacts[rc])
+		print (found_persons)
+		if len(found_persons) == 1:
+			print (found_persons[name])
 		else:
-			print (name, 'Not found')
+			print ("Which {}".format(name))
+			for i, name in enumerate(found_persons):
+				print ([i], name, end=' ',)
+			choice = input('')
+			print (found_persons[choice])
 
 	def show_all_contact(self):
 		contacts = session.query(User).all()
@@ -73,42 +67,33 @@ class Contact():
 	def send_text(self,name,text):
 		self.name =  name
 		self.text = text
-		res =[]
-
-		for i in self.contacts:
-			if name in i or name == i:
-				res.append(i.split(' '))
+		
+		results = session.query(User).all()
+		found_persons = {}
+		for person in results:
+			if name in person.name or name == person.name:
+				found_persons[person.name] = person.phonenumber 
 			continue
-		if len(res) == 1:
-			if len(res[0]) > 1:
-				only_contact = " ".join(res[0])
-				print ('sending message to {}'.format(self.contacts[only_contact]))
-				send_message(self.contacts[only_contact],text)
-			else:
-				only_contact = res[0][0]
-				print ('sending message to {}'.format(self.contacts[only_contact]))
-				send_message(self.contacts[only_contact],text)
+		
+		if len(found_persons) == 1:
+			send_message(found_persons[name],text)
 		else:
-			print ('which {}?'.format(name))
-
-			for j in range (len(res)):
-				print ('{}{},'.format([j+1],res[j][1]),)
-
-			choice = int(raw_input('\n'))
-			rc = ' '.join(res[choice-1])
-			print ('sending message to {}'.format(self.contacts[rc]))
-			send_message(self.contacts[rc],text)
+			print ("Which {}".format(name))
+			for i, name in enumerate(found_persons):
+				print ([i], name, end=' ',)
+			choice = input('')
+			send_message(found_persons[choice],text)
 if __name__ == "__main__":
 	arguements = docopt(__doc__)
 	contact = Contact()
 	if arguements['add']:
-		contact.add_contacts(arguements['<name>'],arguements['<phonenumeber>'])
+		contact.add_contacts(arguements['<name>'],arguements['<phonenumber>'])
 	elif arguements['search']:
 		contact.search(arguements['<name>'])
 	elif arguements['show_all']:
 		contact.show_all_contact()
 
 	else:
-		contact.send_text(arguements['<name>'],arguements['<text>'])
-		
+		contact.send_text(arguements['<name>'],arguements['<message>'])
+	
 		
