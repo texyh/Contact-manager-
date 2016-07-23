@@ -57,7 +57,10 @@ class Contact():
 			for i, name in enumerate(found_persons):
 				print ([i], name, end=' ',)
 			choice = input('')
-			print (found_persons[choice])
+			if choice in found_persons:
+				print (found_persons[choice])
+			else:
+				print ('not found')
 
 	def show_all_contact(self):
 		contacts = session.query(User).all()
