@@ -60,7 +60,7 @@ class Contact():
 			if choice in found_persons:
 				print (found_persons[choice])
 			else:
-				print ('not found')
+				print ('Not found')
 
 	def show_all_contact(self):
 		contacts = session.query(User).all()
